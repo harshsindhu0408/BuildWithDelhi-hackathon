@@ -70,7 +70,7 @@ function Message() {
         );
       } catch (error) {
         console.log(error.message);
-        logout();
+        
         navigate("/login");
       }
     }

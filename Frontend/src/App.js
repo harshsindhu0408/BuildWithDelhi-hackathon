@@ -9,6 +9,8 @@ import { PrivateRoute } from "./components/router/PrivateRouter";
 import { PrivateRouteAnalysis } from "./components/router/PrivateRouterAnalysis";
 import Analysis from "./pages/analysis/analysis";
 import Error from "./pages/error/error";
+import ClientData from "./components/Forms/ClientData";
+import TherapistData from "./components/Forms/TherapistData";
 
 function App() {
   const { login } = useContext(LoginContext);
@@ -53,6 +55,8 @@ function App() {
           }
         />
         <Route path="*" element={<Error />} />
+        <Route path="/getClientData" element={<ClientData />} />
+        <Route path="getTherapistData" element={<TherapistData />} />
       </Routes>
     </BrowserRouter>
   );
