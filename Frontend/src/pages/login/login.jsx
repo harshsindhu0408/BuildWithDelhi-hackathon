@@ -1,8 +1,4 @@
 import { useContext, useEffect, useState } from "react";
-import styles from "./login.module.css";
-import InputBox from "../../components/inputBox/inputBox";
-import Button from "../../components/button/button";
-import GoogleIcon from "../../svgs/googleicon.png";
 import {
   LoginWithEmail,
   LoginWithGoogle,
@@ -12,239 +8,144 @@ import { useNavigate } from "react-router-dom";
 import LoginContext from "../../context/context";
 
 function Login() {
-  const [isRegistered, setIsRegister] = useState(true);
-  const [isLoading, setIsLoading] = useState(false);
-  const [loginData, setLoginData] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
-  const [loginError, setLoginError] = useState(false);
-  const [errorMessage,setErrorMessage] = useState('')
   const [loggedIn, setLoggedIn] = useState(false);
-  const [logging, setLogging] = useState(false);
-  const [error, setError] = useState({
-    name: "",
-    email: "",
-    password: "",
-  });
   const navigate = useNavigate();
-  const {login} = useContext(LoginContext)
-  useEffect(() => {
-    if (isRegistered === true) {
-      setError({
-        email: "",
-        password: "",
-      });
-    } else {
-      setError({
-        name: "",
-        email: "",
-        password: "",
-      });
-    }
-  }, [isRegistered]);
+  const { login } = useContext(LoginContext);
 
-  // const {  } = useContext(userContext);
-
-  const handleLoginDataChange = (e, text) => {
-    setLoginError(false)
-    const change = e.target.value;
-    setLoginData((d) => {
-      d[text] = change;
-      return { ...d };
-    });
-  };
-  const handleLoginWithGoogle =  () => {
-    async function loginGoogle(){
+  const handleLoginWithGoogle = () => {
+    async function loginGoogle() {
       try {
         const res = await LoginWithGoogle();
-        if(res){
+        if (res) {
           setLoggedIn(true);
         }
-      } catch (error) {
-        
-      }
+      } catch (error) {}
     }
     loginGoogle();
-    
-  }
-  const LoginandSignup = async (e) => {
-    try {
-      if (isRegistered) {
-        const login = await LoginWithEmail(loginData.email, loginData.password);
-        setLogging(false);
-        setLoggedIn(true);
-      } else {
-        const Signup = await SignupWithEmail(
-          loginData.email,
-          loginData.password
-        );
-        setLogging(false);
-        setLoggedIn(true);
-      }
-    } catch (error) {
-      setLoginError(true);
-      setErrorMessage(error.message)
-      setLogging(false);
-    }
   };
-  const handleSubmitButton = (e) => {
-    e.preventDefault();
-    //first check for errors and then only update the error and if the error is empty send a request
 
-    if (!isRegistered) {
-      if (loginData.name === "") {
-        setError((prev) => {
-          return { ...prev, name: "please Enter a name" };
-        });
-      } else {
-        setError((prev) => {
-          delete prev.name;
-          return { ...prev };
-        });
-      }
-    }
+  //   try {
+  //     if (isRegistered) {
+  //       const login = await LoginWithEmail(loginData.email, loginData.password);
+  //       setLogging(false);
+  //       setLoggedIn(true);
+  //     } else {
+  //       const Signup = await SignupWithEmail(
+  //         loginData.email,
+  //         loginData.password
+  //       );
+  //       setLogging(false);
+  //       setLoggedIn(true);
+  //     }
+  //   } catch (error) {
+  //     setLoginError(true);
+  //     setErrorMessage(error.message)
+  //     setLogging(false);
+  //   }
+  // };
+  // const handleSubmitButton = (e) => {
+  //   e.preventDefault();
+  //   //first check for errors and then only update the error and if the error is empty send a request
 
-    if (loginData.email === "") {
-      setError((prev) => {
-        return { ...prev, email: "please enter an email" };
-      });
-    } else {
-      const isCorrectMail = loginData.email
-        .toLowerCase()
-        .match(
-          /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
-        );
+  //   if (!isRegistered) {
+  //     if (loginData.name === "") {
+  //       setError((prev) => {
+  //         return { ...prev, name: "please Enter a name" };
+  //       });
+  //     } else {
+  //       setError((prev) => {
+  //         delete prev.name;
+  //         return { ...prev };
+  //       });
+  //     }
+  //   }
 
-      if (!isCorrectMail) {
-        setError((prev) => {
-          return { ...prev, email: "please enter a correct email" };
-        });
-      } else {
-        setError((prev) => {
-          delete prev.email;
-          return { ...prev };
-        });
-      }
-    }
+  //   if (loginData.email === "") {
+  //     setError((prev) => {
+  //       return { ...prev, email: "please enter an email" };
+  //     });
+  //   } else {
+  //     const isCorrectMail = loginData.email
+  //       .toLowerCase()
+  //       .match(
+  //         /^(([^<>()[\]\\.,;:\s@"]+(\.[^<>()[\]\\.,;:\s@"]+)*)|.(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/
+  //       );
 
-    if (loginData.password === "") {
-      setError((prev) => {
-        return { ...prev, password: "please enter a password" };
-      });
-    } else if (loginData.password.length < 8) {
-      setError((prev) => {
-        return { ...prev, password: "please enter a longer password" };
-      });
-    } else {
-      setError((prev) => {
-        delete prev.password;
-        return { ...prev };
-      });
-    }
-    setLogging(true);
-    // calling the request
-    LoginandSignup();
-  };
+  //     if (!isCorrectMail) {
+  //       setError((prev) => {
+  //         return { ...prev, email: "please enter a correct email" };
+  //       });
+  //     } else {
+  //       setError((prev) => {
+  //         delete prev.email;
+  //         return { ...prev };
+  //       });
+  //     }
+  //   }
+
+  //   if (loginData.password === "") {
+  //     setError((prev) => {
+  //       return { ...prev, password: "please enter a password" };
+  //     });
+  //   } else if (loginData.password.length < 8) {
+  //     setError((prev) => {
+  //       return { ...prev, password: "please enter a longer password" };
+  //     });
+  //   } else {
+  //     setError((prev) => {
+  //       delete prev.password;
+  //       return { ...prev };
+  //     });
+  //   }
+  //   setLogging(true);
+  //   // calling the request
+  //   LoginandSignup();
+  // };
   useEffect(() => {
-    
-    if (loggedIn){ 
-      login()
-      navigate("/message")};
+    if (loggedIn) {
+      login();
+      navigate("/message");
+    }
   }, [loggedIn]);
-  useEffect(() => {
-    if (Object.keys(error).length === 0) {
-    }
-  }, [error]);
-  return (
-    <div className={styles.pageContainer}>
-      <div className={styles.pageContent}>
-        <div className={styles.leftContainer}>
-          <div className={styles.loginContainer} onSubmit={handleSubmitButton}>
-            <header>
-              {isRegistered ? (
-                <h2>
-                  Welcome Back <span>👋</span>
-                </h2>
-              ) : (
-                <h2>
-                  Register a New Account <span>👇</span>
-                </h2>
-              )}
-            </header>
-            <main>
-              <InputBox
-                label="Email"
-                name="email"
-                type="email"
-                disabled={isLoading}
-                value={loginData.email}
-                handleChange={handleLoginDataChange}
-                error={error.email}
-                placeholder="example@email.com"
-              />
 
-              <InputBox
-                label="Password"
-                name="password"
-                type="password"
-                disabled={isLoading}
-                value={loginData.password}
-                handleChange={handleLoginDataChange}
-                error={error.password}
-                placeholder="At least 8 characters"
-              />
-              {isRegistered && loginError && <span className="text-center">Invalid credentials</span>}
-              {!isRegistered && loginError && <span className="text-center">Error Creating Account</span>}
-              <Button
-                text={isRegistered ? "Sign in" : "Sign up"}
-                type="submit"
-                handleClick={handleSubmitButton}
-                logging={logging}
-                style={{
-                  backgroundColor: isRegistered
-                    ? "rgb(144, 0, 64)"
-                    : "rgb(0, 144, 101)",
-                }}
-              />
-              <div className="text-center mt-2 opacity-70">
-                <span style={{ font: `'Inter', sans-serif` }}>OR</span>
-              </div>
-              <div
-                className={styles.googleButton}
-                onClick={() => {
-                  handleLoginWithGoogle();
-                }}
-              >
-                <img src={GoogleIcon} alt="" className={styles.googleImage} />
-                <div>{isRegistered ? "Signin " : "Signup "}With Google</div>
-              </div>
-            </main>
-            <footer>
-              {isRegistered
-                ? `Don't have an account?`
-                : `Already have an account?`}{" "}
-              {
-                <span
-                  onClick={() => {
-                    setIsRegister((value) => !value);
-                    setLoginData({
-                      name: "",
-                      email: "",
-                      password: "",
-                    });
-                  }}
-                >
-                  {isRegistered ? "Sign up" : "Sign in"}
-                </span>
-              }
-            </footer>
-          </div>
-        </div>
-        <div className={styles.rightContainer}>{/* img */}</div>
-      </div>
-    </div>
+  return (
+    <>
+      <main className="flex flex-col bg-neutral-800 items-center justify-center w-full min-h-screen">
+        <button
+          onClick={() => {
+            handleLoginWithGoogle();
+          }}
+          className="flex items-center justify-center gap-2 px-4 py-2 text-lg w-80 gap-x-8
+          font-semibold text-white bg-slate-700  border border-transparent 
+          rounded-md hover:scale-105 transition-all duration-200"
+        >
+          <svg
+            className="h-6 w-auto"
+            viewBox="0 0 256 262"
+            preserveAspectRatio="xMidYMid"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M255.878 133.451c0-10.734-.871-18.567-2.756-26.69H130.55v48.448h71.947c-1.45 12.04-9.283 30.172-26.69 42.356l-.244 1.622 38.755 30.023 2.685.268c24.659-22.774 38.875-56.282 38.875-96.027"
+              fill="#4285F4"
+            ></path>
+            <path
+              d="M130.55 261.1c35.248 0 64.839-11.605 86.453-31.622l-41.196-31.913c-11.024 7.688-25.82 13.055-45.257 13.055-34.523 0-63.824-22.773-74.269-54.25l-1.531.13-40.298 31.187-.527 1.465C35.393 231.798 79.49 261.1 130.55 261.1"
+              fill="#34A853"
+            ></path>
+            <path
+              d="M56.281 156.37c-2.756-8.123-4.351-16.827-4.351-25.82 0-8.994 1.595-17.697 4.206-25.82l-.073-1.73L15.26 71.312l-1.335.635C5.077 89.644 0 109.517 0 130.55s5.077 40.905 13.925 58.602l42.356-32.782"
+              fill="#FBBC05"
+            ></path>
+            <path
+              d="M130.55 50.479c24.514 0 41.05 10.589 50.479 19.438l36.844-35.974C195.245 12.91 165.798 0 130.55 0 79.49 0 35.393 29.301 13.925 71.947l42.211 32.783c10.59-31.477 39.891-54.251 74.414-54.251"
+              fill="#EB4335"
+            ></path>
+          </svg>
+          Sign in with Google
+        </button>
+      </main>
+    </>
   );
 }
 

@@ -74,14 +74,6 @@ const scoreMapTxtcolArr = [
 ];
 
 function ScoreChart({ dataset }) {
-  // Sample data (replace it with your own data)
-  //   const sampleData = [
-  //     { timestamp: 1609459200, score: 5 },
-  //     { timestamp: 1609545600, score: 7 },
-  //     { timestamp: 1609632000, score: 3 },
-  //     // Add more data points as needed
-  //   ];
-
   let sampleData = dataset
     .map((rep) => ({
       score: 11 - parseInt(rep.score),
@@ -108,7 +100,6 @@ function ScoreChart({ dataset }) {
   });
 
   useEffect(() => {
-    // Extract timestamps and scores from the sample data
     const timestamps = sampleData.map((data) =>
       new Date(data.timestamp).toLocaleDateString()
     );
@@ -135,7 +126,7 @@ function ScoreChart({ dataset }) {
           text: "Timestamp",
         },
         ticks: {
-          display: false, // Hide timestamp ticks
+          display: false,
         },
         grid: {
           display: false,
@@ -168,9 +159,8 @@ function ScoreChart({ dataset }) {
         enabled: false,
       },
     },
-    maintainAspectRatio: false, // Add this line to allow custom height
+    maintainAspectRatio: false,
     responsive: true,
-    // aspectRatio: 2, // Set the aspect ratio based on your preference
   };
 
   return (
@@ -199,16 +189,19 @@ function Analysis() {
 
   useEffect(() => {
     async function fetchData() {
-      const { data } = await axios.get(
-        process.env.REACT_APP_API_LINK + "/fetchanalysis",
-        {
-          withCredentials: true,
-        }
-      );
+      try {
+        const { data } = await axios.get(
+          process.env.REACT_APP_API_LINK + "/fetchanalysis",
+          {
+            withCredentials: true,
+          }
+        );
 
-      setAnalysisHist(data.data);
-      setCurState("list");
-      //   console.log(data);
+        setAnalysisHist(data.data);
+        setCurState("list");
+      } catch (error) {
+        console.error("Error fetching analysis data", error);
+      }
     }
     fetchData();
   }, []);
@@ -222,9 +215,7 @@ function Analysis() {
           withCredentials: true,
         }
       );
-      // console.log(data);
-      console.log("new analysis");
-      // console.log(analysisHist);
+
       if (data.msg === "nochatdata") {
         setCurState("nochatdata");
       }
@@ -235,7 +226,9 @@ function Analysis() {
           return cur;
         });
       }
-    } catch (error) {}
+    } catch (error) {
+      console.error("Error fetching new analysis", error);
+    }
 
     setFetchNew(false);
   }
@@ -248,37 +241,31 @@ function Analysis() {
           withCredentials: true,
         }
       );
-      console.log(data);
+
       if (data?.msg === "loggedout") {
         logout();
+        navigate('/')
       }
     } catch (error) {
-      console.log("Err in logout");
+      console.error("Error during logout", error);
     }
   };
+  console.log("login hai :", loggedIn);
 
   return (
     <div className={styles.analysisContainer}>
       <header>
-        <div className={styles.logoContainer} onClick={()=>{
-          navigate('/')
-        }}>
+        <div className={styles.logoContainer} onClick={() => navigate('/')}>
           <Logo />
           <div className={styles.headerText}>
-            <h4>MindMate</h4>
-            <h6>A mental health chat assistance</h6>
+            <h4>BrainLink</h4>
+            <h6>A mental health chat assistant fostering mental health through personalized chats.</h6>
           </div>
         </div>
 
         <div className="flex flex-row gap-4">
           {loggedIn && (
-            <button
-              onClick={() => {
-                navigate("/message");
-              }}
-            >
-              Chat
-            </button>
+            <button onClick={() => navigate("/message")}>Chat</button>
           )}
           <button
             onClick={() => {
@@ -288,7 +275,7 @@ function Analysis() {
               }
             }}
           >
-            {!loggedIn ? <LuLogIn /> : <LuLogOut />}
+            {!loggedIn ? "Login" : "Logout"}
           </button>
         </div>
       </header>
@@ -327,7 +314,7 @@ function Analysis() {
             <div style={{ textAlign: "center" }}>
               No Chat History Data!
               <br />
-              Chat with us before analysing.
+              Chat with us before analyzing.
             </div>
           )}
           {curState === "list" && analysisHist.length === 0 && (

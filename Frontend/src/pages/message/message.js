@@ -35,19 +35,22 @@ function Message() {
   const [chatInit, setChatInit] = useState(false);
   const [message, setMessage] = useState("");
   let ws = useRef(null);
-  console.log(chatId);
+  console.log("Chat Id: ", chatId);
+  
   useEffect(() => {
     if (mainRef.current) {
       const container = mainRef.current;
       container.scrollTop = container.scrollHeight;
     }
   }, [chat]);
+  
   useEffect(() => {
     async function fetchData() {
       try {
         const data = await axios.get(process.env.REACT_APP_API_LINK + "/chat", {
           withCredentials: true,
         });
+        console.log("user", data);
         setChatId(data.data.chatId);
         console.log(data);
       } catch (error) {
@@ -56,6 +59,7 @@ function Message() {
     }
     fetchData().finally(() => console.log(88));
   }, []);
+
   useEffect(() => {
     if (chatId !== null) {
       //make a websocket connection here
@@ -72,6 +76,7 @@ function Message() {
         if (data?.type === "server:chathist") {
           // console.log(data.data);
           const histdata = data?.data;
+          console.log("history", histdata);
           if (!histdata) return;
 
           for (let conv of histdata) {
@@ -180,8 +185,8 @@ function Message() {
         >
           <Logo />
           <div className={styles.headerText}>
-            <h4>MindMate</h4>
-            <h6>A mental health chat assistance</h6>
+            <h4>BrainLink</h4>
+            <h6>A virtual confidante fostering mental health through personalized chats.</h6>
           </div>
         </div>
 
@@ -202,10 +207,11 @@ function Message() {
               if (!loggedIn) navigate("/login");
               else {
                 logoutUser();
+                navigate("/login");
               }
             }}
           >
-            {!loggedIn ? <LuLogIn /> : <LuLogOut />}
+            {!loggedIn ? <div>Login</div> : <div>Logout</div>}
           </button>
         </div>
       </header>

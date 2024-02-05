@@ -1,6 +1,6 @@
 {
     "version": 2,
-    "name": "mindmate_email",
+    "name": "brainlink_email",
     "builds": [
        { "src": "index.js", "use": "@vercel/node" }
     ],

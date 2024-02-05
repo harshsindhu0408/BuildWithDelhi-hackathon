@@ -23,7 +23,7 @@ class Email{
             const info = await this.transporter.sendMail({
                 from : this.email,
                 to : email,
-                subject : "MindMate Update",
+                subject : "BrainLink Update",
                 text : "HEHE",
                 html : dataToSend
             })

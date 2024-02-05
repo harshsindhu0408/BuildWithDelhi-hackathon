@@ -1,6 +1,6 @@
 import styles from "./homepage.module.css";
 import { Logo } from "../../svgs/logoSVG";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Image from "../../svgs/SVG/SVG/FrontImage3.svg";
 import { useCookies } from "react-cookie";
 import axios from "axios";
@@ -10,6 +10,7 @@ import { useContext, useRef } from "react";
 import LoginContext from "../../context/context";
 import Articles from "../Articles/Articles";
 import piechart from "../../svgs/piechart.png";
+import CustomText from "../../components/CustomText";
 
 function Homepage() {
   const navigate = useNavigate();
@@ -45,15 +46,18 @@ function Homepage() {
   return (
     <div className={styles.homepageContainer}>
       <header>
-        <div className={styles.logoContainer}>
-          <Logo />
-          <div className={styles.headerText}>
-            <h4 className={styles.text}>MindMate</h4>
-            <h6 className={`${styles.text} text-xs`}>
-              A mental health chat assistance
-            </h6>
+        <Link to={"/"}>
+          <div className={styles.logoContainer}>
+            <Logo />
+            <div className={styles.headerText}>
+              <h4 className={styles.text}>BrainLink</h4>
+              <h6 className={`${styles.text} text-xs`}>
+                A virtual confidante fostering mental health through
+                personalized chats.
+              </h6>
+            </div>
           </div>
-        </div>
+        </Link>
         <div className="flex flex-row gap-4">
           {loggedIn && (
             <button
@@ -72,23 +76,25 @@ function Homepage() {
               }
             }}
           >
-            {!loggedIn ? <LuLogIn /> : <LuLogOut />}
+            {!loggedIn ? <div>Login</div> : <div>Logout</div>}
           </button>
         </div>
       </header>
+
       <main style={{ minHeight: "100vh" }}>
         <section className={styles.leftSection}>
-          <h1>
-            Mental Health <br /> Solved with{" "}
-            <span className={styles.ai}>AI</span>
-          </h1>
+          <CustomText props={"Mental Health Solved With AI"} />
           <div
             className={styles.chatWithUs}
             onClick={() => {
-              navigate("/message");
+              if(!loggedIn){
+                navigate("/login");
+              }else{
+                navigate("/message");
+              }
             }}
           >
-            chat with us...<span className={styles.cursor}></span>
+            Chat with us.....<span className="cursor-pointer"></span>
           </div>
         </section>
         <section className={styles.rightSection}>
@@ -190,18 +196,7 @@ function Homepage() {
               </div>
             </div>
             <div className="flex flex-col justify-center items-center gap-3 text-lg">
-              <a
-                href="https://github.com/subharthihazra/MindMate"
-                className=" text-white"
-              >
-                <div>Github</div>
-              </a>
-              <a
-                href="https://www.youtube.com/watch?v=fUD5HcZhtQI"
-                className=" text-white"
-              >
-                <div>Youtube</div>
-              </a>
+              Footerrrrrrrrr
             </div>
           </div>
           <div className="text-center">© 2024 by Algovengers</div>
