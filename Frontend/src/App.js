@@ -3,7 +3,6 @@ import Homepage from "./pages/homepage/homepage";
 import LoginPage from "./pages/login/login";
 import Message from "./pages/message/message";
 import { useContext, useEffect } from "react";
-import { Cookies, useCookies } from "react-cookie";
 import axios from "axios";
 import LoginContext from "./context/context";
 import { PrivateRoute } from "./components/router/PrivateRouter";
@@ -53,8 +52,7 @@ function App() {
             </PrivateRouteAnalysis>
           }
         />
-        <Route path="*"  element = {<Error />} />
-
+        <Route path="*" element={<Error />} />
       </Routes>
     </BrowserRouter>
   );

@@ -5,8 +5,7 @@ const Schema = mongoose.Schema;
 const chatHistSchema = new Schema({
   // User information
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    type: String,
     required: true,
   },
   // Chat details
