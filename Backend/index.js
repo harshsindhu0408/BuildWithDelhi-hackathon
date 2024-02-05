@@ -11,7 +11,19 @@ dotenv.config();
 const app = express();
 
 app.use(
-  cors()
+  cors({
+    origin: [
+      "http://127.0.0.1:5500",
+      "http://localhost:5500",
+      "http://localhost:3000",
+      "https://mind-mate-wellness.vercel.app/",
+      "https://mind-mate-wellness.vercel.app",
+      "http://mind-mate-wellness.vercel.app/",
+      "http://mind-mate-wellness.vercel.app",
+    ],
+    credentials: true,
+    exposedHeaders: ["set-cookie", "token"],
+  })
 );
 // parse form data
 app.use(express.urlencoded({ extended: false }));
