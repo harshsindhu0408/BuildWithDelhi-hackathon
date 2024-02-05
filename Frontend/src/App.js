@@ -11,6 +11,7 @@ import Analysis from "./pages/analysis/analysis";
 import Error from "./pages/error/error";
 import ClientData from "./components/Forms/ClientData";
 import TherapistData from "./components/Forms/TherapistData";
+import RoleSelection from "./components/Forms/RoleSelection";
 
 function App() {
   const { login } = useContext(LoginContext);
@@ -56,7 +57,8 @@ function App() {
         />
         <Route path="*" element={<Error />} />
         <Route path="/getClientData" element={<ClientData />} />
-        <Route path="getTherapistData" element={<TherapistData />} />
+        <Route path="/getTherapistData" element={<TherapistData />} />
+        <Route path="/roleSelection" element={<RoleSelection />} />
       </Routes>
     </BrowserRouter>
   );
