@@ -5,16 +5,20 @@ const querystring = require("querystring");
 dotenv.config();
 const { startGeminiChat } = require("../gemini/chat.js");
 const chatHistModel = require("../models/ChatHist.js");
+const chatGroupSchema = require("../models/ChatGroups.js");
 
 const connectWithChatBot = async (req, res) => {
+  const { chatGroup } = req.body;
   try {
-    if (req.userId === undefined) {
-      res.status(400).json({ error: "User ID is undefined." });
-      return;
+    if (!chatGroup) {
+      return res.status(422).json({ error: "ChatGroup is required" });
     }
-    console.log("user mil gaya");
+    const isChatGroupAvaialable = await chatGroupSchema.findById(chatGroup);
+    if (!isChatGroupAvaialable) {
+      return res.status(404).json({ error: "Invalid Chat Group" });
+    }
     const foundHist = await chatHistModel
-      .find({ userId: req.userId })
+      .find({ chatgroup })
       .sort({ timestamp: 1 });
 
     let foundHistForGemini = [];
@@ -38,11 +42,10 @@ const connectWithChatBot = async (req, res) => {
     }
     console.log("gemini ki history", foundHistForGemini);
 
-    const roomId = uuid();
     const websocketserverLink = `${
       process.env.WEBSOCKET_SERVER
     }?${querystring.stringify({
-      id: roomId,
+      id: chatGroup,
       isServer: true,
     })}`;
 
@@ -90,9 +93,10 @@ const connectWithChatBot = async (req, res) => {
           wss.send(JSON.stringify({ type: "server:response:end" }));
 
           await chatHistModel.create({
-            userId: req.userId,
+            chatgroup,
             prompt: data.prompt,
             response: respText,
+            userId: req.userId
           });
         }
       } catch (error) {

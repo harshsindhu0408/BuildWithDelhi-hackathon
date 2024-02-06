@@ -18,17 +18,9 @@ const getChatGroups = async (req, res) => {
 
 const createAllGroups = async (req, res) => {
     try {
-        const allData = await ChatHist.find().populate('userId').exec((err, data) => {
-          if(err){
-            console.error(err);
-            return;
-          }
-          console.log('All Data', data);
-        });
-        // const groupedBy = allData.reduce((x, y) => {
-        //   (x[y.userId] = x[y.userId] || []).push(y);
-        //   return x;
-        // }, {});
+        const userData = await userModel.find();
+        console.log(userData);
+        const allData = await ChatHist.find();
         return res.json(allData);
     } catch (error) {
         console.log(error);
@@ -36,4 +28,18 @@ const createAllGroups = async (req, res) => {
     }
 };
 
-module.exports = { getChatGroups, createAllGroups };
+const createsingleChatGroup = async (req,res) => {
+  const { body:{ name }, userId } = req;
+  if(!name || !name.trim().length){
+    return res.status(422).send("Name is required");
+  }
+  try {
+   const createUser = (await chatGroupSchema.create({ userId, name })).save();
+    return res.send("ChatGroup is created");
+  } catch (error) {
+    console.log(error);
+    return res.status(500).send("Something went wrong");
+  }
+}
+
+module.exports = { getChatGroups, createAllGroups, createsingleChatGroup };
