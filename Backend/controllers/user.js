@@ -1,14 +1,13 @@
-const user = require("../models/User");
 const { genAnalysis } = require("./analysis");
 const report = require("../models/Report");
 const { v4: uuid } = require("uuid");
-const User = require("../models/User");
+const UserModel = require("../models/User");
 const { decodeAuthToken } = require("../firebase/auth");
 
 async function signup(req, res) {
   try {
     const { userId } = req.body;
-    const isUserPresent = await user.findOne({ userId });
+    const isUserPresent = await UserModel.findOne({ userId });
     if (isUserPresent && isUserPresent.isConfigured) {
       return res.status(422).send("User Already Present");
     }
@@ -45,7 +44,7 @@ async function signup(req, res) {
     if ((role === "therapist" && !specialization) || !experienceYears) {
       return res.status(422).send("Therapist details required");
     }
-    const user = await user.create({
+    const user = await UserModel.create({
       userId,
       email,
       role,
@@ -67,6 +66,7 @@ async function signup(req, res) {
       },
       isConfigured: true,
     });
+    await user.save();
 
     res.cookie("userid", userId, {
       maxAge: 1209600000, //14 * 24 * 60 * 60 * 1000 -> 14days
@@ -90,7 +90,7 @@ async function login(req, res) {
       return;
     }
     //get Data from email from database
-    const data = await user.findOne({ email: email });
+    const data = await UserModel.findOne({ email: email });
 
     if (data?.id) {
       res.cookie("userid", data.id, {
@@ -113,7 +113,7 @@ async function isUser(req, res) {
     if (req.cookies?.userid) {
       const userid = req.cookies?.userid;
       // console.log(userid);
-      const user = await User.find({ id: userid });
+      const user = await UserModel.find({ id: userid });
       // console.log(user, "Here");
       if (user?.length != 0) {
         res.status(200).json({ message: "User validated" });
