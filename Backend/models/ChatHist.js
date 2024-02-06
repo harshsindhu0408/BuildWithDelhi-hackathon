@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 
 const chatHistSchema = new Schema({
   // User information
-  userId: {
+  chatgroup: {
     type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
+    ref: "ChatGroups",
     required: true,
   },
   // Chat details

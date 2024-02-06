@@ -18,8 +18,12 @@ const getChatGroups = async (req, res) => {
 
 const createAllGroups = async (req, res) => {
     try {
-        const allData = await ChatHist.find({
-          userId: "e6d032ac-db67-4418-987d-1d6e3637cd01",
+        const allData = await ChatHist.find().populate('userId').exec((err, data) => {
+          if(err){
+            console.error(err);
+            return;
+          }
+          console.log('All Data', data);
         });
         // const groupedBy = allData.reduce((x, y) => {
         //   (x[y.userId] = x[y.userId] || []).push(y);
