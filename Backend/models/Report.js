@@ -4,7 +4,7 @@ const Schema = mongoose.Schema;
 
 const reportSchema = new mongoose.Schema({
   userId: {
-    type: String,
+    type: mongoose.Schema.Types.ObjectId,
     required: true,
   },
   score: {
