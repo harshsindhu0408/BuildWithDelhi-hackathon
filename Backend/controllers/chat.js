@@ -8,7 +8,7 @@ const chatHistModel = require("../models/ChatHist.js");
 const chatGroupSchema = require("../models/ChatGroups.js");
 
 const connectWithChatBot = async (req, res) => {
-  const { chatGroup } = req.body;
+  const { chatGroup } = req.query;
   try {
     if (!chatGroup) {
       return res.status(422).json({ error: "ChatGroup is required" });
