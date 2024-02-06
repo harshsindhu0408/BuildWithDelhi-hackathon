@@ -96,6 +96,7 @@ const connectWithChatBot = async (req, res) => {
             chatgroup,
             prompt: data.prompt,
             response: respText,
+            userId: req.userId
           });
         }
       } catch (error) {
