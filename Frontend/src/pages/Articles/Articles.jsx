@@ -11,6 +11,7 @@ function Articles({ title, description, link, Image }) {
           <div>Learn more</div>
         </a>
       </div>
+      
       <div className="overflow-hidden relative">
         <img
           src={Image}

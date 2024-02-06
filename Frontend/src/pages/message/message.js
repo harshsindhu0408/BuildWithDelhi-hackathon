@@ -1,11 +1,10 @@
 import { useNavigate } from "react-router-dom";
 import { Logo } from "../../svgs/logoSVG";
 import styles from "./message.module.css";
-import { useCallback, useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import axios from "axios";
 import Markdown from "react-markdown";
 import LoginContext from "../../context/context";
-import { LuLogIn, LuLogOut } from "react-icons/lu";
 
 function Chat({ text, own, isLoading = false }) {
   return (
@@ -33,31 +32,49 @@ function Message() {
   const [chat, setChat] = useState([]);
   const [chatState, setChatState] = useState("busy");
   const [chatInit, setChatInit] = useState(false);
+  const [chatError, setChatError] = useState(false);
   const [message, setMessage] = useState("");
   let ws = useRef(null);
-  console.log("Chat Id: ", chatId);
-  
+
   useEffect(() => {
     if (mainRef.current) {
       const container = mainRef.current;
       container.scrollTop = container.scrollHeight;
     }
   }, [chat]);
-  
+
   useEffect(() => {
     async function fetchData() {
       try {
         const data = await axios.get(process.env.REACT_APP_API_LINK + "/chat", {
           withCredentials: true,
         });
-        console.log("user", data);
         setChatId(data.data.chatId);
-        console.log(data);
       } catch (error) {
+        setChatState("busy");
         console.log("Error Fetching Data");
+        setChatError(true);
       }
     }
-    fetchData().finally(() => console.log(88));
+    fetchData();
+  }, []);
+
+  useEffect(() => {
+    async function isUser() {
+      try {
+        const user = await axios.get(
+          process.env.REACT_APP_API_LINK + "/isUser",
+          {
+            withCredentials: true,
+          }
+        );
+      } catch (error) {
+        console.log(error.message);
+        
+        navigate("/login");
+      }
+    }
+    isUser();
   }, []);
 
   useEffect(() => {
@@ -70,13 +87,11 @@ function Message() {
         ws.current.send(JSON.stringify({ type: "client:chathist" }));
       });
       wss.addEventListener("message", (event) => {
-        // console.log(event.data);
         const data = JSON.parse(event.data);
+        setChatError(false);
 
         if (data?.type === "server:chathist") {
-          // console.log(data.data);
           const histdata = data?.data;
-          console.log("history", histdata);
           if (!histdata) return;
 
           for (let conv of histdata) {
@@ -96,7 +111,6 @@ function Message() {
 
           setChatState("idle");
           setChatInit(true);
-          // promptBut.disabled = false;
         } else if (data?.type === "server:response:start") {
           // setChat((prevchat) => [
           //   ...prevchat,
@@ -104,9 +118,6 @@ function Message() {
           // ]);
         } else if (data?.type === "server:response:chunk") {
           setChat((prevchat) => {
-            // prevchat.at(-1).message += data.chunk;
-            // console.log("!!!", prevchat);
-            // console.log("!!!", prevchat.slice(-1));
             return [
               ...prevchat.slice(0, -1),
               {
@@ -118,10 +129,7 @@ function Message() {
               },
             ];
           });
-          // console.log("@text", data.chunk);
         } else if (data?.type === "server:response:end") {
-          // response = "";
-          // promptBut.disabled = false;
           setChat((prevchat) => {
             return [
               ...prevchat.slice(0, -1),
@@ -136,12 +144,15 @@ function Message() {
         }
       });
       ws.current = wss;
+    } else {
+      setChatState("busy");
+      setChatInit(true);
+      setChatError(true);
     }
   }, [chatId]);
 
   const handleClick = () => {
     setChat((prevchat) => [...prevchat, { message, own: true }]);
-    console.log(message);
     ws.current?.send(
       JSON.stringify({
         type: "client:prompt",
@@ -149,7 +160,6 @@ function Message() {
       })
     );
     setMessage("");
-    console.log("hogaya");
     setChatState("busy");
     setChat((prevchat) => [
       ...prevchat,
@@ -165,9 +175,18 @@ function Message() {
           withCredentials: true,
         }
       );
-      console.log(data);
       if (data?.msg === "loggedout") {
         logout();
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+        document.cookie.split(";").forEach((c) => {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(
+              /=.*/,
+              "=;expires=" + new Date().toUTCString() + ";path=/"
+            );
+        });
       }
     } catch (error) {
       console.log("Err in logout");
@@ -186,7 +205,10 @@ function Message() {
           <Logo />
           <div className={styles.headerText}>
             <h4>BrainLink</h4>
-            <h6>A virtual confidante fostering mental health through personalized chats.</h6>
+            <h6>
+              A virtual confidante fostering mental health through personalized
+              chats.
+            </h6>
           </div>
         </div>
 
@@ -227,30 +249,41 @@ function Message() {
             : {}
         }
       >
-        {!chatInit && (
-          <div className={styles.loadingChatInit}>
-            <LoaderRipple />
+        {chatError ? (
+          <div className="text-center">
+            <div className={styles.emptyChat}>Something went wrong!</div>
+            <a style={{ color: "blue", textDecoration: "underline" }}>
+              Try again
+            </a>
+          </div>
+        ) : (
+          <div>
+            {!chatInit && (
+              <div className={styles.loadingChatInit}>
+                <LoaderRipple />
+              </div>
+            )}
+            {chatInit && chat.length === 0 && (
+              <div className={styles.emptyChat}>
+                No Previous Chat History!
+                <br />
+                Chat with me now.
+              </div>
+            )}
+            {chatInit &&
+              chat &&
+              chat.map((x, i) => {
+                return (
+                  <Chat
+                    text={x.message}
+                    own={x.own}
+                    key={i}
+                    isLoading={x.isLoading ? true : false}
+                  />
+                );
+              })}
           </div>
         )}
-        {chatInit && chat.length === 0 && (
-          <div className={styles.emptyChat}>
-            No Previous Chat History!
-            <br />
-            Chat with me now.
-          </div>
-        )}
-        {chatInit &&
-          chat &&
-          chat.map((x, i) => {
-            return (
-              <Chat
-                text={x.message}
-                own={x.own}
-                key={i}
-                isLoading={x.isLoading ? true : false}
-              />
-            );
-          })}
       </main>
       <footer>
         <form
@@ -259,18 +292,25 @@ function Message() {
           }}
         >
           <input
+            disabled={chatState === "busy" ? true : false}
+            placeholder={
+              chatState === "busy"
+                ? "Something went wrong!"
+                : "Type your prompt here...."
+            }
             type="text"
             value={message}
             onChange={(e) => setMessage(e.target.value)}
           />
           <button
             type="submit"
+            className="material-symbols-outlined"
             onClick={() => {
               handleClick();
             }}
-            // disabled={chatState === "busy" ? true : false}
+            disabled={chatState === "busy" ? true : false}
           >
-            <span className="material-symbols-outlined">send</span>
+            send
           </button>
         </form>
       </footer>

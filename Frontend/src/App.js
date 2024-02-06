@@ -3,13 +3,15 @@ import Homepage from "./pages/homepage/homepage";
 import LoginPage from "./pages/login/login";
 import Message from "./pages/message/message";
 import { useContext, useEffect } from "react";
-import { Cookies, useCookies } from "react-cookie";
 import axios from "axios";
 import LoginContext from "./context/context";
 import { PrivateRoute } from "./components/router/PrivateRouter";
 import { PrivateRouteAnalysis } from "./components/router/PrivateRouterAnalysis";
 import Analysis from "./pages/analysis/analysis";
 import Error from "./pages/error/error";
+import ClientData from "./components/Forms/ClientData";
+import TherapistData from "./components/Forms/TherapistData";
+import RoleSelection from "./components/Forms/RoleSelection";
 
 function App() {
   const { login } = useContext(LoginContext);
@@ -53,8 +55,10 @@ function App() {
             </PrivateRouteAnalysis>
           }
         />
-        <Route path="*"  element = {<Error />} />
-
+        <Route path="*" element={<Error />} />
+        <Route path="/getClientData" element={<ClientData />} />
+        <Route path="/getTherapistData" element={<TherapistData />} />
+        <Route path="/roleSelection" element={<RoleSelection />} />
       </Routes>
     </BrowserRouter>
   );
