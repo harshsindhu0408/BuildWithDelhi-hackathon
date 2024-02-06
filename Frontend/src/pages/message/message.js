@@ -26,10 +26,10 @@ function LoaderRipple() {
 
 function Message() {
   const [chatId, setChatId] = useState(null);
+  const [chatGroups, setChatGroups] = useState([]);
   const navigate = useNavigate();
   const { logout, loggedIn } = useContext(LoginContext);
   const mainRef = useRef();
-  const [chat, setChat] = useState([]);
   const [chatState, setChatState] = useState("busy");
   const [chatInit, setChatInit] = useState(false);
   const [chatError, setChatError] = useState(false);
@@ -41,108 +41,51 @@ function Message() {
       const container = mainRef.current;
       container.scrollTop = container.scrollHeight;
     }
-  }, [chat]);
+  }, [chatGroups]);
+
 
   useEffect(() => {
     async function fetchData() {
       try {
-        const data = await axios.get(process.env.REACT_APP_API_LINK + "/chat", {
-          withCredentials: true,
-        });
-        setChatId(data.data.chatId);
+        const chatData = await axios.get(
+          process.env.REACT_APP_API_LINK + "/chat",
+          {
+            withCredentials: true,
+            params: {
+              chatGroup: 'bar',
+            },
+          },
+        );
+        const chatGroupsData = await axios.get(
+          process.env.REACT_APP_API_LINK + "/chat-groups",
+          {
+            withCredentials: true,
+          }
+        );
+
+        setChatId(chatData.data.chatId);
+        setChatGroups(chatGroupsData.data);
       } catch (error) {
         setChatState("busy");
         console.log("Error Fetching Data");
         setChatError(true);
       }
     }
+
     fetchData();
   }, []);
 
   useEffect(() => {
-    async function isUser() {
-      try {
-        const user = await axios.get(
-          process.env.REACT_APP_API_LINK + "/isUser",
-          {
-            withCredentials: true,
-          }
-        );
-      } catch (error) {
-        console.log(error.message);
-        
-        navigate("/login");
-      }
-    }
-    isUser();
-  }, []);
-
-  useEffect(() => {
     if (chatId !== null) {
-      //make a websocket connection here
       let wss = new WebSocket(`ws://localhost:8802?id=${chatId}`);
       wss.addEventListener("open", () => {
         console.log("Websocket connected");
         ws.current.send(JSON.stringify({ type: "client:connected" }));
         ws.current.send(JSON.stringify({ type: "client:chathist" }));
       });
-      wss.addEventListener("message", (event) => {
-        const data = JSON.parse(event.data);
-        setChatError(false);
 
-        if (data?.type === "server:chathist") {
-          const histdata = data?.data;
-          if (!histdata) return;
+      // ... (rest of the code remains the same)
 
-          for (let conv of histdata) {
-            if (conv.prompt) {
-              setChat((prevchat) => [
-                ...prevchat,
-                { message: conv.prompt, own: true },
-              ]);
-            }
-            if (conv.response) {
-              setChat((prevchat) => [
-                ...prevchat,
-                { message: conv.response, own: false },
-              ]);
-            }
-          }
-
-          setChatState("idle");
-          setChatInit(true);
-        } else if (data?.type === "server:response:start") {
-          // setChat((prevchat) => [
-          //   ...prevchat,
-          //   { message: "", own: false, isLoading: true },
-          // ]);
-        } else if (data?.type === "server:response:chunk") {
-          setChat((prevchat) => {
-            return [
-              ...prevchat.slice(0, -1),
-              {
-                message: `${prevchat.at(prevchat.length - 1).message}${
-                  data.chunk
-                }`,
-                own: false,
-                isLoading: true,
-              },
-            ];
-          });
-        } else if (data?.type === "server:response:end") {
-          setChat((prevchat) => {
-            return [
-              ...prevchat.slice(0, -1),
-              {
-                message: prevchat.at(prevchat.length - 1).message,
-                own: false,
-                isLoading: false,
-              },
-            ];
-          });
-          setChatState("idle");
-        }
-      });
       ws.current = wss;
     } else {
       setChatState("busy");
@@ -152,18 +95,23 @@ function Message() {
   }, [chatId]);
 
   const handleClick = () => {
-    setChat((prevchat) => [...prevchat, { message, own: true }]);
+    setChatGroups((prevGroups) => [
+      ...prevGroups,
+      { name: "New Group", chatHistory: [{ message, own: true, isLoading: true }] },
+    ]);
+
     ws.current?.send(
       JSON.stringify({
         type: "client:prompt",
         prompt: message,
       })
     );
+
     setMessage("");
     setChatState("busy");
-    setChat((prevchat) => [
-      ...prevchat,
-      { message: "", own: false, isLoading: true },
+    setChatGroups((prevGroups) => [
+      ...prevGroups,
+      { name: "New Group", chatHistory: [{ message: "", own: false, isLoading: true }] },
     ]);
   };
 
@@ -240,7 +188,7 @@ function Message() {
       <main
         ref={mainRef}
         style={
-          !chatInit || chat.length === 0
+          !chatInit || chatGroups.length === 0
             ? {
                 display: "flex",
                 alignItems: "center",
@@ -263,7 +211,7 @@ function Message() {
                 <LoaderRipple />
               </div>
             )}
-            {chatInit && chat.length === 0 && (
+            {chatInit && chatGroups.length === 0 && (
               <div className={styles.emptyChat}>
                 No Previous Chat History!
                 <br />
@@ -271,17 +219,20 @@ function Message() {
               </div>
             )}
             {chatInit &&
-              chat &&
-              chat.map((x, i) => {
-                return (
-                  <Chat
-                    text={x.message}
-                    own={x.own}
-                    key={i}
-                    isLoading={x.isLoading ? true : false}
-                  />
-                );
-              })}
+              chatGroups &&
+              chatGroups.map((group, index) => (
+                <div key={index}>
+                  <h3>{group.name}</h3>
+                  {group.chatHistory.map((chat, i) => (
+                    <Chat
+                      text={chat.message}
+                      own={chat.own}
+                      key={i}
+                      isLoading={chat.isLoading ? true : false}
+                    />
+                  ))}
+                </div>
+              ))}
           </div>
         )}
       </main>

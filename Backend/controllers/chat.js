@@ -10,8 +10,8 @@ const chatGroupSchema = require("../models/ChatGroups.js");
 const connectWithChatBot = async (req, res) => {
   const { chatGroup } = req.query;
   try {
-    if (!chatGroup) {
-      return res.status(422).json({ error: "ChatGroup is required" });
+    if (!chatGroup || !chatGroup.match(/^[0-9a-fA-F]{24}$/)) {
+      return res.status(422).json({ error: "ChatGroup is invalid" });
     }
     const isChatGroupAvaialable = await chatGroupSchema.findById(chatGroup);
     if (!isChatGroupAvaialable) {
