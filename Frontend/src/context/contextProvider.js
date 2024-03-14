@@ -1,8 +1,16 @@
-import { useState } from "react"
-import LoginContext from "./context"
+import { useEffect, useState } from "react";
+import Cookie from 'js-cookie';
+import LoginContext from "./context";
 
 const ContextProvider = ({children})=>{
     const [loggedIn,setLoggedIn] = useState(false);
+
+    useEffect(()=>{
+        const isuser = Cookie.get('uid') || Cookie.get('userid');
+        if(isuser){
+            setLoggedIn(true);
+        }
+    },[])
     function login(){
         setLoggedIn(true);
     }

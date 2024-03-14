@@ -14,11 +14,11 @@ router.route("/chat").get(userMiddleware, connectWithChatBot);
 router.route("/analysis").get(userMiddleware, doAnalysis);
 router.route("/fetchanalysis").get(userMiddleware, getAnalysis);
 router.route('/getbelowscorer').get(userMiddleware, getBelowAverageScoreData);
-router.route("/signup").post(signup);
+router.route("/signup").post(userMiddleware,signup);
 router.route("/login").post(login);
-router.route("/isUser").get(isUser);
-router.route("/logout").get(logout);
-router.route('/getchatgroups').get(getChatGroups);
+router.route("/isUser").get(userMiddleware,isUser);
+router.route("/logout").get(userMiddleware,logout);
+router.route('/getchatgroups').get(userMiddleware,getChatGroups);
 router.route('/createallgroups').post(createAllGroups);
 router.route('/createchatgroup').post(userMiddleware,createsingleChatGroup);
 

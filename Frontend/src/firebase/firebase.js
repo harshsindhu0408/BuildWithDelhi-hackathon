@@ -22,9 +22,8 @@ const firebaseConfig = {
   projectId: "intelligence-753d4",
   storageBucket: "intelligence-753d4.appspot.com",
   messagingSenderId: "932832582285",
-  appId: "1:932832582285:web:199299ead3518fcb4ea0c4"
+  appId: "1:932832582285:web:199299ead3518fcb4ea0c4",
 };
-
 
 // Initialize Firebase
 const app = initializeApp(firebaseConfig);
@@ -40,19 +39,19 @@ async function LoginWithGoogle() {
     const data = await signInWithPopup(auth, provider);
     const credential = GoogleAuthProvider.credentialFromResult(data);
     const token = credential.accessToken;
-    console.log(credential);
+    // console.log(credential);
     const user = data.user;
-    console.log(user);
+    document.cookie = 'uid' + "=" + (user.uid || "") + "; path=/";
     //  //from here we will send data to backend to store the email
     const info = getAdditionalUserInfo(data).isNewUser; //If this is true we will send the mail along with uid of firebase and uuid of chat
     //  // If this is false we will just user the access token...
-    console.log(info);
+    // console.log(info);
 
     if (info) {
       const headers = {
         token: "Bearer " + user.accessToken,
       };
-      console.log(headers);
+      // console.log(headers);
 
       const signup = await axios.post(
         process.env.REACT_APP_API_LINK + "/signup",
@@ -63,14 +62,14 @@ async function LoginWithGoogle() {
       const headers = {
         token: "Bearer " + user.accessToken,
       };
-      console.log(headers);
+      // console.log(headers);
       const signup = await axios.post(
         process.env.REACT_APP_API_LINK + "/login",
         {},
         { headers, withCredentials: true }
       );
     }
-    return true;
+    return user;
   } catch (error) {
     console.log(error.message);
     return false;
@@ -113,4 +112,8 @@ async function SignupWithEmail(email, password) {
   }
 }
 
-export { LoginWithGoogle, LoginWithEmail, SignupWithEmail };
+async function GetFirebaseUser() {
+  return getAuth().currentUser;
+}
+
+export { LoginWithGoogle, LoginWithEmail, SignupWithEmail ,GetFirebaseUser};

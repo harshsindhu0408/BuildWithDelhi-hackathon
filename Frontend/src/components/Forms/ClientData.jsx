@@ -1,6 +1,9 @@
 import React, { useState } from "react";
+import { GetFirebaseUser } from "../../firebase/firebase";
+import { useNavigate } from "react-router-dom";
 
 const ClientData = () => {
+  const navigate = useNavigate();
   const [userFormData, setUserFormData] = useState({
     userId: "",
     email: "",
@@ -22,23 +25,52 @@ const ClientData = () => {
     }));
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
-    // Handle form submission with userFormData
-    console.log("Form submitted:", userFormData);
-    // Reset form data if needed
-    setUserFormData({
-      userId: "",
-      email: "",
-      fullName: "",
-      phoneNumber: "",
-      street: "",
-      city: "",
-      state: "",
-      zipCode: "",
-      DOB: "",
-      gender: "",
-    });
+    const user = await GetFirebaseUser();
+    const userDetails = {
+      userId: user.uid,
+      email: user.email,
+      name: user.displayName,
+      phoneno: e.target.floating_phoneNumber.value,
+      city: e.target.floating_city.value,
+      state: e.target.floating_state.value,
+      zip: e.target.floating_zipCode.value,
+      dob: e.target.floating_DOB.value,
+      gender: e.target.floating_gender.value,
+      role: "client",
+    };
+    console.log(userDetails);
+    if (user) {
+      async function signUp() {
+        const res = await fetch(process.env.REACT_APP_API_LINK + "/signup", {
+          method: "POST",
+          credentials: "include",
+          body: JSON.stringify(userDetails),
+          headers: {
+            "Content-Type": "application/json",
+          },
+        });
+        if (res.status === 200 || res.status === 409) {
+          navigate("/message");
+          setUserFormData({
+            userId: "",
+            email: "",
+            fullName: "",
+            phoneNumber: "",
+            street: "",
+            city: "",
+            state: "",
+            zipCode: "",
+            DOB: "",
+            gender: "",
+          });
+        }
+      }
+      signUp();
+    } else {
+      window.location.href = "/login";
+    }
   };
 
   return (

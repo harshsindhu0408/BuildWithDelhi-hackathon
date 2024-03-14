@@ -6,10 +6,11 @@ const { decodeAuthToken } = require("../firebase/auth");
 
 async function signup(req, res) {
   try {
-    const { userId } = req.body;
+    const userId = req.userId;
+    console.log(userId);
     const isUserPresent = await UserModel.findOne({ userId });
     if (isUserPresent && isUserPresent.isConfigured) {
-      return res.status(422).send("User Already Present");
+      return res.status(409).send("User Already Present");
     }
     const {
       email: useremail,
@@ -41,12 +42,12 @@ async function signup(req, res) {
     if (!role || (role != "client" && role != "therapist")) {
       return res.status(422).send("Role is not present");
     }
-    if ((role === "therapist" && !specialization) || !experienceYears) {
+    if (role === "therapist" && (!specialization || !experienceYears)) {
       return res.status(422).send("Therapist details required");
     }
     const user = await UserModel.create({
       userId,
-      email,
+      email: useremail,
       role,
       fullName: name,
       phoneNumber: phoneno,
@@ -67,16 +68,9 @@ async function signup(req, res) {
       isConfigured: true,
     });
     await user.save();
-
-    res.cookie("userid", userId, {
-      maxAge: 1209600000, //14 * 24 * 60 * 60 * 1000 -> 14days
-      httpOnly: true,
-      sameSite: "None",
-      secure: true,
-    });
     return res.status(200).send("Account Created");
   } catch (error) {
-    console.log(error.message);
+    console.log(error);
     res.status(401).json({ message: "Invalid Access Token" });
   }
 }
@@ -109,16 +103,16 @@ async function login(req, res) {
 
 async function isUser(req, res) {
   try {
-    // console.log(req.cookies);
-    if (req.cookies?.userid) {
-      const userid = req.cookies?.userid;
-      // console.log(userid);
-      const user = await UserModel.find({ id: userid });
+    console.log(req.cookies?.uid);
+    if (req.cookies?.uid) {
+      const userid = req.cookies?.uid;
+      console.log(userid);
+      const user = await UserModel.find({ userId: userid });
       // console.log(user, "Here");
       if (user?.length != 0) {
         res.status(200).json({ message: "User validated" });
       } else {
-        res.status(401).json({ error: "Logged Out" });
+        res.status(404).json({ error: "user not found" });
       }
     } else {
       res.status(401).json({ error: "Logged Out" });
@@ -130,7 +124,7 @@ async function isUser(req, res) {
 }
 
 async function logout(req, res) {
-  if (!req.cookies?.userid) {
+  if (!req.cookies?.uid) {
     res.status(401).json({ Error: "UserId not found" });
     return;
   }

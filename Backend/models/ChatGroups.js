@@ -11,8 +11,7 @@ const chatGroupSchema = new Schema({
   },
   chatIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "ChatHist" }],
   userId: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
+    type:String,
     required: true,
     index: true,
   },
