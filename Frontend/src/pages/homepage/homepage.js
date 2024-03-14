@@ -64,7 +64,6 @@ function Homepage() {
               onClick={() => {
                 navigate("/analysis");
               }}
-              
             >
               Button
             </button>
@@ -80,7 +79,6 @@ function Homepage() {
             {!loggedIn ? <div>Login</div> : <div>Logout</div>}
           </button>
         </div>
-
       </header>
 
       <main style={{ minHeight: "100vh" }}>
@@ -101,7 +99,11 @@ function Homepage() {
           </div>
         </section>
         <section className={styles.rightSection}>
-          <img className="bg-transparent" src="https://images.rawpixel.com/image_png_1100/cHJpdmF0ZS9sci9pbWFnZXMvd2Vic2l0ZS8yMDIzLTA4L3Jhd3BpeGVsb2ZmaWNlMl9odW1hbl9icmFpbl9pc29sYXRlZF9vbl93aGl0ZV9iYWNrZ3JvdW5kX2NiNzQ5MjJlLTk3NzUtNDVjYi1iZDgzLTY4ZTIyMWY4YTZjNC5wbmc.png" alt="" />
+          <img
+            className="bg-transparent"
+            src="https://png.pngtree.com/png-clipart/20230508/original/pngtree-human-brain-vector-images-png-image_9149149.png"
+            alt=""
+          />
         </section>
       </main>
 
@@ -189,7 +191,7 @@ function Homepage() {
               Footerrrrrrrrr
             </div>
           </div>
-          <div className="text-center">© 2024 by Algovengers</div>
+          <div className="text-center">© 2024 by Team404</div>
         </div>
       </footer>
     </div>

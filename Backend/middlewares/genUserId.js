@@ -1,8 +1,8 @@
 const { v4: uuid } = require("uuid");
 
 async function userMiddleware(req, res, next) {
-  const userId = req.cookies?.userid;
-  // console.log(userId);
+  const userId = req.cookies?.uid;
+  console.log("++++====",userId);
   if (userId && userId.trim() !== "") {
     req.userId = userId;
   } else {

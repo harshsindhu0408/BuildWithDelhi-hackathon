@@ -1,11 +1,8 @@
 import { useContext, useEffect, useState } from "react";
-import {
-  LoginWithEmail,
-  LoginWithGoogle,
-  SignupWithEmail,
-} from "../../firebase/firebase";
+import { LoginWithGoogle } from "../../firebase/firebase";
 import { Link, useNavigate } from "react-router-dom";
 import LoginContext from "../../context/context";
+import axios from "axios";
 
 function Login() {
   const [loggedIn, setLoggedIn] = useState(false);
@@ -17,6 +14,24 @@ function Login() {
       try {
         const res = await LoginWithGoogle();
         if (res) {
+          async function isUser() {
+            try {
+              const user = await axios.get(
+                process.env.REACT_APP_API_LINK + "/isUser",
+                {
+                  withCredentials: true,
+                }
+              );
+              if (user) {
+                console.log("Yes");
+              }
+            } catch (error) {
+              if (error.response.status === 404) {
+                navigate("/roleSelection");
+              }
+            }
+          }
+          isUser();
           setLoggedIn(true);
         }
       } catch (error) {}

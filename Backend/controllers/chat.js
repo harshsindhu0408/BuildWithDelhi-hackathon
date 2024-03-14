@@ -18,7 +18,7 @@ const connectWithChatBot = async (req, res) => {
       return res.status(404).json({ error: "Invalid Chat Group" });
     }
     const foundHist = await chatHistModel
-      .find({ chatgroup })
+      .find({ chatgroup: chatGroup })
       .sort({ timestamp: 1 });
 
     let foundHistForGemini = [];
@@ -53,7 +53,7 @@ const connectWithChatBot = async (req, res) => {
 
     wss.on("open", () => {
       console.log("WebSocket connection opened");
-      res.status(200).json({ chatId: roomId });
+      res.status(200).json({ chatId: chatGroup });
       wss.send(JSON.stringify({ type: "server:connected" }));
     });
 
