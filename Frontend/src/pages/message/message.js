@@ -26,15 +26,13 @@ function LoaderRipple() {
 
 function Message() {
   const [chatId, setChatId] = useState(null);
-  const [chatGroup, setChatGroup] = useState(null);
   const navigate = useNavigate();
   const { logout, loggedIn } = useContext(LoginContext);
   const mainRef = useRef();
-  const [chatState, setChatState] = useState("busy");
   const [chat, setChat] = useState([]);
+  const [chatState, setChatState] = useState("busy");
   const [chatInit, setChatInit] = useState(false);
   const [chatError, setChatError] = useState(false);
-  const [userChatGroups, setUserChatGroups] = useState([]);
   const [message, setMessage] = useState("");
   let ws = useRef(null);
 
@@ -46,66 +44,53 @@ function Message() {
   }, [chat]);
 
   useEffect(() => {
-    async function fetchGroups() {
-      try {
-        const chatGroupsData = await axios.get(
-          process.env.REACT_APP_API_LINK + "/getchatgroups",
-          {
-            withCredentials: true,
-          }
-        );
-        if (chatGroupsData.data.length !== 0) {
-          setChatGroup(chatGroupsData.data[0]);
-        }
-        setUserChatGroups(chatGroupsData.data);
-      } catch (error) {
-        console.log("Error Fetching Data");
-      }
-    }
-    fetchGroups();
-  }, []);
-
-  useEffect(() => {
     async function fetchData() {
       try {
-        const chatData = await axios.get(
-          process.env.REACT_APP_API_LINK + "/chat",
-          {
-            withCredentials: true,
-            params: {
-              chatGroup: chatGroup._id,
-            },
-          }
-        );
-        setChatId(chatData.data.chatId);
+        const data = await axios.get(process.env.REACT_APP_API_LINK + "/chat", {
+          withCredentials: true,
+        });
+        setChatId(data.data.chatId);
       } catch (error) {
         setChatState("busy");
         console.log("Error Fetching Data");
         setChatError(true);
       }
     }
-
     fetchData();
-  }, [chatGroup]);
+  }, []);
+
+  useEffect(() => {
+    async function isUser() {
+      try {
+        const user = await axios.get(
+          process.env.REACT_APP_API_LINK + "/isUser",
+          {
+            withCredentials: true,
+          }
+        );
+      } catch (error) {
+        console.log(error.message);
+        navigate("/login");
+      }
+    }
+    isUser();
+  }, []);
 
   useEffect(() => {
     if (chatId !== null) {
+      //make a websocket connection here
       let wss = new WebSocket(`ws://localhost:8802?id=${chatId}`);
       wss.addEventListener("open", () => {
         console.log("Websocket connected");
         ws.current.send(JSON.stringify({ type: "client:connected" }));
         ws.current.send(JSON.stringify({ type: "client:chathist" }));
       });
-
-      // ... (rest of the code remains the same)
       wss.addEventListener("message", (event) => {
-        // console.log(event.data);
         const data = JSON.parse(event.data);
+        setChatError(false);
 
         if (data?.type === "server:chathist") {
-          // console.log(data.data);
           const histdata = data?.data;
-          console.log("history", histdata);
           if (!histdata) return;
 
           for (let conv of histdata) {
@@ -125,7 +110,6 @@ function Message() {
 
           setChatState("idle");
           setChatInit(true);
-          // promptBut.disabled = false;
         } else if (data?.type === "server:response:start") {
           // setChat((prevchat) => [
           //   ...prevchat,
@@ -133,9 +117,6 @@ function Message() {
           // ]);
         } else if (data?.type === "server:response:chunk") {
           setChat((prevchat) => {
-            // prevchat.at(-1).message += data.chunk;
-            // console.log("!!!", prevchat);
-            // console.log("!!!", prevchat.slice(-1));
             return [
               ...prevchat.slice(0, -1),
               {
@@ -147,10 +128,7 @@ function Message() {
               },
             ];
           });
-          // console.log("@text", data.chunk);
         } else if (data?.type === "server:response:end") {
-          // response = "";
-          // promptBut.disabled = false;
           setChat((prevchat) => {
             return [
               ...prevchat.slice(0, -1),
@@ -164,7 +142,6 @@ function Message() {
           setChatState("idle");
         }
       });
-
       ws.current = wss;
     } else {
       setChatState("busy");
@@ -175,7 +152,6 @@ function Message() {
 
   const handleClick = () => {
     setChat((prevchat) => [...prevchat, { message, own: true }]);
-    console.log(message);
     ws.current?.send(
       JSON.stringify({
         type: "client:prompt",
@@ -183,7 +159,6 @@ function Message() {
       })
     );
     setMessage("");
-    console.log("hogaya");
     setChatState("busy");
     setChat((prevchat) => [
       ...prevchat,
@@ -216,27 +191,6 @@ function Message() {
       console.log("Err in logout");
     }
   };
-
-  function handleNewChat() {
-    async function fetchData() {
-      try {
-        const chatData = await axios.post(
-          process.env.REACT_APP_API_LINK + "/createchatgroup",
-          {
-            name: "New Chat",
-          },
-          {
-            withCredentials: true,
-          }
-        );
-        console.log(chatData);
-      } catch (error) {
-        console.log("Error Fetching Data");
-      }
-    }
-
-    fetchData();
-  }
 
   return (
     <div className={styles.messageContainer}>
@@ -282,84 +236,54 @@ function Message() {
           </button>
         </div>
       </header>
-      <div className="w-full flex flex-row justify-center text-center">
-        <div className="w-1/6 bg-gray-400 rounded-lg ml-2">
-          <div className={styles.chatGroupContainer}>
-            <button
-              onClick={() => handleNewChat()}
-              className="rounded-md px-4 py-2 bg-green-800 text-white m-2"
-            >
-              New Chat
-            </button>
-            {userChatGroups.map((group, index) => (
-              <button
-                key={index}
-                className="m-2 bg-red-400 py-2 px-4 rounded"
-                onClick={() => {
-                  setChatInit(false);
-                  setChatError(false);
-                  setChatState("busy");
-                  ws.current?.send(
-                    JSON.stringify({
-                      type: "client:chathist",
-                      chatGroup: group._id,
-                    })
-                  );
-                }}
-              >
-                {group.name}
-              </button>
-            ))}
+      <main
+        ref={mainRef}
+        style={
+          !chatInit || chat.length === 0
+            ? {
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+              }
+            : {}
+        }
+      >
+        {chatError ? (
+          <div className="text-center">
+            <div className={styles.emptyChat}>Something went wrong!</div>
+            <a style={{ color: "blue", textDecoration: "underline" }}>
+              Try again
+            </a>
           </div>
-        </div>
-        <div className="w-full">
-          <main
-            ref={mainRef}
-            style={{
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-            }}
-          >
-            {chatError ? (
-              <div className="text-center">
-                <div className={styles.emptyChat}>Something went wrong!</div>
-                <a style={{ color: "blue", textDecoration: "underline" }}>
-                  Try again
-                </a>
-              </div>
-            ) : (
-              <div>
-                {!chatInit && (
-                  <div className={styles.loadingChatInit}>
-                    <LoaderRipple />
-                  </div>
-                )}
-                {chatInit && chat.length === 0 && (
-                  <div className={styles.emptyChat}>
-                    No Previous Chat History!
-                    <br />
-                    Chat with me now.
-                  </div>
-                )}
-                {chatInit &&
-                  chat &&
-                  chat.map((x, i) => {
-                    return (
-                      <Chat
-                        text={x.message}
-                        own={x.own}
-                        key={i}
-                        isLoading={x.isLoading ? true : false}
-                      />
-                    );
-                  })}
+        ) : (
+          <div>
+            {!chatInit && (
+              <div className={styles.loadingChatInit}>
+                <LoaderRipple />
               </div>
             )}
-          </main>
-        </div>
-      </div>
-
+            {chatInit && chat.length === 0 && (
+              <div className={styles.emptyChat}>
+                No Previous Chat History!
+                <br />
+                Chat with me now.
+              </div>
+            )}
+            {chatInit &&
+              chat &&
+              chat.map((x, i) => {
+                return (
+                  <Chat
+                    text={x.message}
+                    own={x.own}
+                    key={i}
+                    isLoading={x.isLoading ? true : false}
+                  />
+                );
+              })}
+          </div>
+        )}
+      </main>
       <footer>
         <form
           onSubmit={(e) => {

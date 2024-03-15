@@ -36,6 +36,16 @@ function Homepage() {
       console.log(data);
       if (data?.msg === "loggedout") {
         logout();
+        window.localStorage.clear();
+        window.sessionStorage.clear();
+        document.cookie.split(";").forEach((c) => {
+          document.cookie = c
+            .replace(/^ +/, "")
+            .replace(
+              /=.*/,
+              "=;expires=" + new Date().toUTCString() + ";path=/"
+            );
+        });
       }
     } catch (error) {
       console.log("Err in logout");

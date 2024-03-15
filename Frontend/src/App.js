@@ -14,7 +14,7 @@ import TherapistData from "./components/Forms/TherapistData";
 import RoleSelection from "./components/Forms/RoleSelection";
 
 function App() {
-  const { login } = useContext(LoginContext);
+  const { login,logout } = useContext(LoginContext);
   useEffect(() => {
     async function isUser() {
       try {
@@ -29,6 +29,7 @@ function App() {
           login();
         }
       } catch (error) {
+        logout()
         console.log(error.message);
       }
     }

@@ -5,20 +5,16 @@ const querystring = require("querystring");
 dotenv.config();
 const { startGeminiChat } = require("../gemini/chat.js");
 const chatHistModel = require("../models/ChatHist.js");
-const chatGroupSchema = require("../models/ChatGroups.js");
 
 const connectWithChatBot = async (req, res) => {
-  const { chatGroup } = req.query;
   try {
-    if (!chatGroup || !chatGroup.match(/^[0-9a-fA-F]{24}$/)) {
-      return res.status(422).json({ error: "ChatGroup is invalid" });
+    if (req.userId === undefined) {
+      res.status(400).json({ error: "User ID is undefined." });
+      return;
     }
-    const isChatGroupAvaialable = await chatGroupSchema.findById(chatGroup);
-    if (!isChatGroupAvaialable) {
-      return res.status(404).json({ error: "Invalid Chat Group" });
-    }
+    console.log("user mil gaya");
     const foundHist = await chatHistModel
-      .find({ chatgroup: chatGroup })
+      .find({ userId: req.userId })
       .sort({ timestamp: 1 });
 
     let foundHistForGemini = [];
@@ -42,10 +38,11 @@ const connectWithChatBot = async (req, res) => {
     }
     console.log("gemini ki history", foundHistForGemini);
 
+    const roomId = uuid();
     const websocketserverLink = `${
       process.env.WEBSOCKET_SERVER
     }?${querystring.stringify({
-      id: chatGroup,
+      id: roomId,
       isServer: true,
     })}`;
 
@@ -53,7 +50,7 @@ const connectWithChatBot = async (req, res) => {
 
     wss.on("open", () => {
       console.log("WebSocket connection opened");
-      res.status(200).json({ chatId: chatGroup });
+      res.status(200).json({ chatId: roomId });
       wss.send(JSON.stringify({ type: "server:connected" }));
     });
 
@@ -93,10 +90,9 @@ const connectWithChatBot = async (req, res) => {
           wss.send(JSON.stringify({ type: "server:response:end" }));
 
           await chatHistModel.create({
-            chatgroup,
+            userId: req.userId,
             prompt: data.prompt,
             response: respText,
-            userId: req.userId
           });
         }
       } catch (error) {
