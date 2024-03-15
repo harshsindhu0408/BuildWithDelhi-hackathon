@@ -44,7 +44,7 @@ function Login() {
       login();
       navigate("/message");
     }
-  }, [loggedIn]);
+  }, []);
 
   return (
     <>

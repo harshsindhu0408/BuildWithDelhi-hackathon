@@ -9,9 +9,10 @@ const chatGroupSchema = new Schema({
     required: true,
     default: String(Date.now()),
   },
-  chatIds: [{ type: mongoose.Schema.Types.ObjectId, ref: "ChatHist" }],
+  chatIds: [{ type: String, ref: "ChatHist" }],
   userId: {
-    type:String,
+    type: String,
+    ref: "User",
     required: true,
     index: true,
   },

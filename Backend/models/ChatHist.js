@@ -4,9 +4,9 @@ const Schema = mongoose.Schema;
 
 const chatHistSchema = new Schema({
   // User information
-  chatgroup: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "ChatGroups",
+  userId: {
+    type: String,
+    ref: 'User',
     required: true,
   },
   // Chat details
@@ -22,11 +22,6 @@ const chatHistSchema = new Schema({
     type: String,
     required: true,
   },
-  userId:{
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true
-  }
 });
 
 module.exports = mongoose.model("ChatHist", chatHistSchema);

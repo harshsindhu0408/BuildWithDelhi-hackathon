@@ -18,8 +18,8 @@ router.route("/signup").post(userMiddleware,signup);
 router.route("/login").post(login);
 router.route("/isUser").get(userMiddleware,isUser);
 router.route("/logout").get(userMiddleware,logout);
-router.route('/getchatgroups').get(userMiddleware,getChatGroups);
-router.route('/createallgroups').post(createAllGroups);
-router.route('/createchatgroup').post(userMiddleware,createsingleChatGroup);
+// router.route('/getchatgroups').get(userMiddleware,getChatGroups);
+// router.route('/createallgroups').post(createAllGroups);
+// router.route('/createchatgroup').post(userMiddleware,createsingleChatGroup);
 
 module.exports = router;

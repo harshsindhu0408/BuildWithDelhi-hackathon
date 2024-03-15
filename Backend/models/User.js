@@ -45,7 +45,7 @@ const userSchema = new mongoose.Schema({
     required: true,
     default: false,
   },
-  reports: [{ type: mongoose.Schema.ObjectId, ref: "Report" }],
+  reports: [{ type: String, ref: "Report" }],
 });
 
 const User = mongoose.model("User", userSchema);
