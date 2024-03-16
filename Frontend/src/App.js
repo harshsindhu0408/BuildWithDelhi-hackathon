@@ -12,6 +12,8 @@ import Error from "./pages/error/error";
 import ClientData from "./components/Forms/ClientData";
 import TherapistData from "./components/Forms/TherapistData";
 import RoleSelection from "./components/Forms/RoleSelection";
+import Articles from "./pages/Articles/Articles";
+import AnimatedCard from "./components/AnimatedCard";
 
 function App() {
   const { login, logout } = useContext(LoginContext);
@@ -60,6 +62,7 @@ function App() {
         <Route path="/getClientData" element={<ClientData />} />
         <Route path="/getTherapistData" element={<TherapistData />} />
         <Route path="/roleSelection" element={<RoleSelection />} />
+        <Route path="/articles" element={<AnimatedCard />} />
       </Routes>
     </BrowserRouter>
   );

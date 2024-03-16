@@ -22,6 +22,16 @@ const ArticlesData = [
     desc: "Snapshots of common mental health conditions and the level of available support in each country.",
     link: "https://www.ourbetterworld.org/series/mental-health/support-toolkit/mental-health-asia-numbers?gad_source=1&gclid=CjwKCAiAq4KuBhA6EiwArMAw1PAkeWx6LtqcCnT_D-palJNRrgIkrnZg4zv4A62QuLDX4aVSiDZ_JRoCla8QAvD_BwE&type=resource",
   },
+  {
+    title: "Mental capacity",
+    desc: "What can cause a lack of mental capacity?",
+    link: "https://www.mentalhealth.org.uk/explore-mental-health/a-z-topics/mental-capacity",
+  },
+  {
+    title: "How to support someone with a mental health problem",
+    desc: "We all go through tough times, and people help us through them. Other times we have been worried about other people’s mental health.",
+    link: "https://www.mentalhealth.org.uk/explore-mental-health/articles/how-support-someone-mental-health-problem",
+  },
 ];
 
 const AnimatedCard = () => {

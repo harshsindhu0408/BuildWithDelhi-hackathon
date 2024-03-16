@@ -192,6 +192,10 @@ function Message() {
     }
   };
 
+  const clearChatHistoryHandler = async () => {
+    setChat([]);
+  };
+
   return (
     <div className={styles.messageContainer}>
       <header>
@@ -284,6 +288,12 @@ function Message() {
           </div>
         )}
       </main>
+      <button
+        onClick={clearChatHistoryHandler}
+        className="py-2 px-4 rounded-md border-gray-800 z-20 border mt-2 mb-2 shadow-xl"
+      >
+        Clear chat history
+      </button>
       <footer>
         <form
           onSubmit={(e) => {

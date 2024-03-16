@@ -72,10 +72,10 @@ function Homepage() {
           {loggedIn && (
             <button
               onClick={() => {
-                navigate("/analysis");
+                navigate("/message");
               }}
             >
-              Button
+              Chat
             </button>
           )}
           <button
@@ -124,7 +124,8 @@ function Homepage() {
         <div className="w-full">
           <img
             className="w-full"
-            src="https://www.athenahealth.com/knowledge-hub/sites/insight/files/inline-images/Mental%20Health%20dataslice_Age%20%281%29.jpg"
+            src="https://assets.weforum.org/editor/ZM8M512ZI2ZMZagSB3MwmmX1URuwvccSy5ISTECukwo.PNG"
+            alt="Data img"
           ></img>
         </div>
       </section>
@@ -197,9 +198,9 @@ function Homepage() {
                 Chat
               </div>
             </div>
-            <div className="flex flex-col justify-center items-center gap-3 text-lg">
+            {/* <div className="flex flex-col justify-center items-center gap-3 text-lg">
               Footerrrrrrrrr
-            </div>
+            </div> */}
           </div>
           <div className="text-center">© 2024 by Team404</div>
         </div>

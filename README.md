@@ -34,10 +34,7 @@ BrainLink application runs on 4 server
   - Web Sockets
   - Node Mailer
 - Tools
-  - Vercel
-  - Render
   - Mongo DB
-  - Mirma Clouds
   - Firebase
 
 

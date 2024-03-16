@@ -1,5 +1,5 @@
 const { Router } = require("express");
-const { connectWithChatBot } = require("../controllers/chat.js");
+const { connectWithChatBot, deleteChatHistory } = require("../controllers/chat.js");
 const { doAnalysis, getAnalysis } = require("../controllers/analysis.js");
 const { userMiddleware } = require("../middlewares/genUserId.js");
 const { signup, login, isUser, logout } = require("../controllers/user.js");
@@ -18,8 +18,6 @@ router.route("/signup").post(userMiddleware,signup);
 router.route("/login").post(login);
 router.route("/isUser").get(userMiddleware,isUser);
 router.route("/logout").get(userMiddleware,logout);
-// router.route('/getchatgroups').get(userMiddleware,getChatGroups);
-// router.route('/createallgroups').post(createAllGroups);
-// router.route('/createchatgroup').post(userMiddleware,createsingleChatGroup);
+router.route("/deleteChat").delete(userMiddleware,deleteChatHistory);
 
 module.exports = router;
