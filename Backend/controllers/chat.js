@@ -119,21 +119,3 @@ const connectWithChatBot = async (req, res) => {
 };
 
 module.exports = { connectWithChatBot };
-
-const deleteChatHistory = async (req, res) => {
-  try {
-    if (req.userId === undefined) {
-      res.status(400).json({ error: "User ID is undefined." });
-      return;
-    }
-
-    await chatHistModel.deleteMany({ userId: req.userId });
-
-    res.status(200).json({ message: "Chat history deleted successfully." });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: "Internal Server Error" });
-  }
-};
-
-module.exports = { deleteChatHistory };
