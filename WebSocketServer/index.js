@@ -6,6 +6,8 @@ const port = process.env.SOCKET_PORT || 8802;
 const wss = new WebSocket.Server({ port: port });
 console.log("server started");
 
+// create websocket map
+
 const map = new Map();
 /* 
     This is an inmemory storage for all the rooms

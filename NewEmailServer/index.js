@@ -8,7 +8,7 @@ const PORT = process.env.SERVER_PORT || 8001;
 
 app.use(bodyParser.json());
 
-// Create a Nodemailer transporter
+// Create a Nodemailer
 const transporter = nodemailer.createTransport({
   service: process.env.SMTP_SERVICE, // e.g., 'gmail'
   auth: {

@@ -1,3 +1,5 @@
+//Basic VS COde settings
+
 {
   "files.exclude": {
     "amplify/.config": true,
